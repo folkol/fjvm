@@ -33,9 +33,7 @@ public class VirtualMachine {
             java.lang.Class<?> clazz = classes.get(mainClassName);
             myMethodStore.readMethods(clazz);
             stackFrame = new StackFrame("doStuff", myMethodStore);
-            System.out.println("Entering method: doStuff (This is fake!)");
             stackFrame2 = new StackFrame("doMoreStuff", myMethodStore);
-            System.out.println("Entering method: doMoreStuff (This is fake!)");
         } catch (SecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -50,7 +48,9 @@ public class VirtualMachine {
         // stackFrame.
         Thread thread = new Thread("Main");
         thread.stack.push(stackFrame);
+        System.out.println("Entering method: doStuff (This is fake!)");
         thread.stack.push(stackFrame2);
+        System.out.println("Entering method: doMoreStuff (This is fake!)");
 
         threads.add(thread);
     }
