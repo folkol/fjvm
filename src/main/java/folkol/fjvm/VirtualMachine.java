@@ -29,16 +29,20 @@ public class VirtualMachine {
         try {
             classPath[0] = new URL("file:/Users/folkol/labbar/fjvm/src/resources/");
             myClassLoader = new URLClassLoader(classPath);
-            Thread thread = new Thread("Main");
-            loadClass(mainClassName);
-            java.lang.Class clazz = classes.get(mainClassName);
+            classes.put(mainClassName, myClassLoader.loadClass(mainClassName));
+            java.lang.Class<?> clazz = classes.get(mainClassName);
             myMethodStore.readMethods(clazz);
             stackFrame = new StackFrame("doStuff", myMethodStore);
+            System.out.println("Entering method: doStuff (This is fake!)");
             stackFrame2 = new StackFrame("doMoreStuff", myMethodStore);
+            System.out.println("Entering method: doMoreStuff (This is fake!)");
         } catch (SecurityException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -49,16 +53,6 @@ public class VirtualMachine {
         thread.stack.push(stackFrame2);
 
         threads.add(thread);
-    }
-
-
-    private void loadClass(String mainClassName) {
-        try {
-            classes.put(mainClassName, myClassLoader.loadClass(mainClassName));
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     public int run() {

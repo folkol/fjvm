@@ -37,14 +37,14 @@ public class MethodStore {
             // ...constant pool table
             short constantCount = classFileStream.readShort();
             for(int i = 0; i < (constantCount - 1); i++) {
-                String constant = skipConstant(classFileStream);
+                String constant = readConstant(classFileStream);
                 constantTable.put(new Integer(i+1), constant);
             }
 
-            // ...access flags
+            // ...class access flags
             classFileStream.skipBytes(2);
 
-            // ...this class reference
+            // ...class reference of this
             classFileStream.skipBytes(2);
 
             // ...super class reference
@@ -65,7 +65,7 @@ public class MethodStore {
             // ...method table
             short methodCount = classFileStream.readShort();
             for(int i = 0; i < methodCount; i++) {
-                skipMethod(classFileStream);
+                parseMethod(classFileStream);
             }
 
             // ...attribute table
@@ -87,7 +87,7 @@ public class MethodStore {
         return methods.get(method);
     }
 
-    private String skipConstant(DataInputStream classFileStream) throws IOException {
+    private String readConstant(DataInputStream classFileStream) throws IOException {
         byte tag = classFileStream.readByte();
         String returnString = null;
         switch (tag) {
@@ -116,7 +116,7 @@ public class MethodStore {
         return returnString;
     }
 
-    private void skipMethod(DataInputStream classFileStream) throws IOException {
+    private void parseMethod(DataInputStream classFileStream) throws IOException {
         // Access flags
         classFileStream.skipBytes(2);
 
@@ -130,7 +130,7 @@ public class MethodStore {
         // Attributes count
         short attributesCount = classFileStream.readShort();
         for(int i = 0; i < attributesCount; i++) {
-            skipAttribute(classFileStream, methodName);
+            parseAttribute(classFileStream, methodName);
         }
 
         // If neither ACC_ABSTRACT nor ACC_NATIVE is set, method byte code will follow here
@@ -155,10 +155,10 @@ public class MethodStore {
     }
 
     private void skipAttribute(DataInputStream classFileStream) throws IOException {
-        skipAttribute(classFileStream, null);
+        parseAttribute(classFileStream, null);
     }
 
-    private void skipAttribute(DataInputStream classFileStream, String method) throws IOException {
+    private void parseAttribute(DataInputStream classFileStream, String method) throws IOException {
         // Attribute name index
         short attributeName = classFileStream.readShort();
         String attributeNameResolved = (String) constantTable.get(new Integer(attributeName));
@@ -169,6 +169,8 @@ public class MethodStore {
         // Attributes
         byte[] bytes = new byte[attributeCount];
         classFileStream.read(bytes);
+
+        // If the attribute is called "Code", then the value of it will be verbatim java byte code, store it!
         if("Code".equals(attributeNameResolved)) {
             methods.put(method, bytes);
         }
