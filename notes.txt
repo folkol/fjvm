@@ -1,0 +1,32 @@
+Basics of class loading:
+
+
+
+Primordial classloader:
+Embedded in the VM, keeps a set of classes which is considered trusted, and which do not need verification.
+* Trusted classes (Do not need verification)
+* Implements the default implementation of loadClass()
+* maps java.lang.Object to java/lang/Object.class to somewhere in the CLASSPATH
+* Implements class path searching, both as plain files and inside zip archives
+* When are classes loaded? Either when bytecode from the class is invoked (new MyObject()) or when some bytecode makes static reference to a class (System.out)
+* Hooks into the JVM which allow user defined class loader which can by any means produce byte code
+
+* A custom classloader is expected to behave in the following manner:
+-Verify class name.
+-Check to see if the class requested has already been loaded.
+-Check to see if the class is a "system" class.
+-Attempt to fetch the class from this class loader's repository.
+-Define the class for the VM.
+-Resolve the class.
+-Return the class to the caller.
+
+* The class loader has got a hash table with classes, only load any class once
+
+* Basic steps of loading a class:
+-Given a type's fully qualified name, produce a stream of binary data that represents that type
+-Parse the stream of binary data produced in step #1 into internal structures in the method area of the JVM. The method area is a logical area of memory in the VM that is used to store information about loaded types.
+-Create an instance of class java.lang.Class that represents the type indicated in step #1
+
+* Classes are namespaced by defining class loader, so com.folkol.Test loaded by CL1 is not the same as com.folkol.Test loaded by CL2.
+
+* 
